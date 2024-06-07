@@ -1,5 +1,5 @@
 
-import { Text, Pressable, View, Image, TextInput } from "react-native"
+import { Text, TouchableOpacity, View, Image, TextInput } from "react-native"
 import { styles } from './styles.jsx';
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -30,12 +30,11 @@ export default function Login({ navigation }){
         username: usuario,
         password: senha
       })
-      console.log(response.data.access);
       setToken(response.data.access)
-      navigation.navigate('Home')
+      navigation.navigate('Navegacao')
     }catch(error){
-      console.error("Deu erro: ", error);
-      // setMessage("Não foi possível realizar o login, tente novamente.")
+      alert("Não foi possível fazer o login.");
+      
     }
   }
 
@@ -76,9 +75,9 @@ export default function Login({ navigation }){
         onChangeText={setSenha}/>
         </View>
         
-        <Pressable style={styles.formButton} onPress={fazerLogin}>
+        <TouchableOpacity style={styles.formButton} onPress={fazerLogin}>
           <Text style={styles.textButton}>Entrar</Text>
-        </Pressable>
+        </TouchableOpacity>
         <Text>{message}</Text>
       </View></View></View></View>
       

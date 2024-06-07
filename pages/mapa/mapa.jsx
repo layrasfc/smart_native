@@ -1,6 +1,7 @@
 
 import { Text, View, Image, Pressable } from 'react-native';
 import { styles } from './styles.jsx';
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState,
    useRef // Usar uma referencia
   } from 'react';
@@ -18,24 +19,56 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 
 // Calculo de distância
 import { getDistance } from 'geolib';
-
+import axios from 'axios';
 
 export default function Mapa() {
-
   const[location, setLocation] = useState(null);
   const[lat, setLat] = useState(null);
   const[long, setLong] = useState(null);
   const mapRef = useRef(MapView);
   const [mensagem, setMensagem] = useState(null)
+  const[sensores, setSensores] = useState([])
+  const[indiceMenor, setIndiceMenor] = useState(null)
 
-  const latSensor = -22.9141414329
-  const longSensor = -47.0683364555
+  const latSensor = -22.9143462
+  const longSensor = -47.0686296
+
+  useEffect(() => {
+    AsyncStorage.getItem('token')
+    .then(async(token) => {
+        const response = await axios.get('https://layrasfc.pythonanywhere.com/api/sensores/',
+          {
+          headers:
+            {
+              'Authorization': `Bearer ${token}`
+            }}
+          )
+        const lista = response.data
+        setSensores(lista.slice(0, 3))
+      })
+      }, [])
+          
+
+  // Pegar o menor valor
+  useEffect(() => {
+    var distancias = []
+    for (let i = 0; i < sensores.length; i++) {
+      const sensor = sensores[i];
+      let sensorLat = sensor.latitude
+      let sensorLong = sensor.longitude
+      distancias.push(verificarDistancia(sensorLat, sensorLong))
+    }
+    var menorValor = Math.min(...distancias)
+
+    setIndiceMenor(distancias.indexOf(menorValor))
+    console.log(indiceMenor);
+    
+  }, [lat, long, sensores])
 
   // Função assíncrona para verificar o acesso
   const solicitarAcesso = async () => {
     // Armazenar a escolha
     const { granted } = await requestForegroundPermissionsAsync();
-    
     if(granted){
       const currentPosition = await getCurrentPositionAsync();
       setLocation(currentPosition);
@@ -69,22 +102,18 @@ export default function Mapa() {
     })
   }, [])
 
-  const verificarDistancia = () => {
+
+  const verificarDistancia = (sensorLat, sensorLong) => {
     if(lat && long){
-      const distancia = getDistance(
+      var distancia = getDistance(
       {latitude: lat, longitude: long},
-      {latitude: latSensor, longitude: longSensor}
+      {latitude: sensorLat, longitude: sensorLong}
     )
-    return `Distância em relação ao sensor mais próximo: ${distancia}m`
-    } else {
-      return "Pegando informações..."
-    }
+    return distancia
+    } 
   }
 
-  // Ao alterar a lat e long é calculada a distancia
-  useEffect(() => {
-    setMensagem(verificarDistancia())
-  }, [lat, long])
+
 
   return (
     <View style={styles.container}>
@@ -110,7 +139,7 @@ export default function Mapa() {
               {/* <Marker pinColor='blue' onPress={()=> {console.log("Cliquei");}}coordinate={{latitude: latSensor, longitude: longSensor}}>
             <Image style={styles.sensorImg} source={require('./assets/SensorImg.png')}/>
             </Marker>  */}
-            <Marker pinColor='blue' onPress={()=> {console.log("Cliquei");}}coordinate={{latitude: latSensor, longitude: longSensor}}/>
+            <Marker pinColor='blue' onPress={()=> {console.log("Cliquei");}} coordinate={{latitude: latSensor, longitude: longSensor}}/>
        
             <Polyline
             coordinates={[
@@ -123,8 +152,7 @@ export default function Mapa() {
           </MapView>
 
         }
-        <Text>{mensagem}</Text>
-      
+
     </View>
 
   );

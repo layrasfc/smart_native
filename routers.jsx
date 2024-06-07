@@ -1,17 +1,10 @@
-// import { NavigationContainer } from "@react-navigation/native"
-// import { createStackNavigator } from "@react-navigation/stack"
-// import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
-import { Feather } from "@expo/vector-icons"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 
 // Importação das páginas
-import Mapa from "./pages/mapa/mapa"
 import Login from "./pages/login/login"
-import Teste2 from "./pages/teste2"
-import Home from "./pages/home/home"
+import Navegacao from "./pages/navegacao/navegacao"
 
 
 const Stack = createStackNavigator()
@@ -27,8 +20,8 @@ function MyTabs(){
       }}
       />
       <Stack.Screen
-      name="Home"
-      component={Home}
+      name="Navegacao"
+      component={Navegacao}
       options={{
         headerShown: false
       }}/>
