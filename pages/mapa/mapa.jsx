@@ -1,5 +1,5 @@
 
-import { Text, View, Image, Pressable } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { styles } from './styles.jsx';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState,
@@ -26,44 +26,48 @@ export default function Mapa() {
   const[lat, setLat] = useState(null);
   const[long, setLong] = useState(null);
   const mapRef = useRef(MapView);
+
   const [mensagem, setMensagem] = useState(null)
   const[sensores, setSensores] = useState([])
-  const[indiceMenor, setIndiceMenor] = useState(null)
+  const[token, setToken] = useState(null)
 
-  const latSensor = -22.9143462
-  const longSensor = -47.0686296
+  const[sensorId, setSensorId] = useState(0)
+
+
+  useEffect(() =>{
+    const pegarToken = async() => {
+      const tokenSalvo = await AsyncStorage.getItem('token')
+      setToken(tokenSalvo)
+    }
+
+    pegarToken()
+  }, [])
 
   useEffect(() => {
-    AsyncStorage.getItem('token')
-    .then(async(token) => {
-        const response = await axios.get('https://layrasfc.pythonanywhere.com/api/sensores/',
+    if(token){
+      const pegarSensores = async() => {
+        let lista = []
+        for (let i = 1; i <= 9; i++) {
+          try{
+          const response = await axios.get(`https://layrasfc.pythonanywhere.com/api/sensores/${i}`,
           {
           headers:
             {
               'Authorization': `Bearer ${token}`
-            }}
-          )
-        const lista = response.data
-        setSensores(lista.slice(0, 3))
-      })
-      }, [])
+            }
+          })
           
+          lista.push(response.data)
+        }catch(error){
+          console.error(`Não foi possível pegar o sensor ${i}: `, error);
+        }}
+        setSensores(lista);
+      }
 
-  // Pegar o menor valor
-  useEffect(() => {
-    var distancias = []
-    for (let i = 0; i < sensores.length; i++) {
-      const sensor = sensores[i];
-      let sensorLat = sensor.latitude
-      let sensorLong = sensor.longitude
-      distancias.push(verificarDistancia(sensorLat, sensorLong))
-    }
-    var menorValor = Math.min(...distancias)
+      pegarSensores()
+    } 
+  }, [token])
 
-    setIndiceMenor(distancias.indexOf(menorValor))
-    console.log(indiceMenor);
-    
-  }, [lat, long, sensores])
 
   // Função assíncrona para verificar o acesso
   const solicitarAcesso = async () => {
@@ -76,8 +80,35 @@ export default function Mapa() {
       setLong(currentPosition.coords.longitude);
     }}
   
-  
+  useEffect(() => {
+    if(sensorId != 0) {
+      const sensor = sensores.find(sensor => sensor.id === sensorId)
+      
+      setMensagem(<View><Text>Informações do sensor:</Text>
+      <Text>Tipo: {sensor.tipo}</Text>
+      <Text>Localização: {sensor.localizacao}</Text>
+      <Text>Responsaveis: {sensor.responsavel}</Text>
+      <Text>Status: {sensor.status_operacional ? "Ligado" : "Desligado"}</Text>
+      <TouchableOpacity style={styles.formButton} onPress={() => {pegarDados(sensor.id, sensor.tipo.toLowerCase())}}><Text>Ver mais</Text></TouchableOpacity>
+      </View>)
+    }
+  }, [sensorId])
 
+  const pegarDados = async(id, tipo) => {
+    
+    console.log("Cheguei aqui, ", id, " tipo: ", tipo);
+    const response = await axios.post(`https://layrasfc.pythonanywhere.com/api/${tipo}_filter/`, 
+      {
+        sensor_id: id
+      },
+      {
+        headers:
+          {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+    console.log(response.data.results);
+  }
   // Pegar a localização padrão
   useEffect(() => {
     solicitarAcesso();
@@ -103,17 +134,6 @@ export default function Mapa() {
   }, [])
 
 
-  const verificarDistancia = (sensorLat, sensorLong) => {
-    if(lat && long){
-      var distancia = getDistance(
-      {latitude: lat, longitude: long},
-      {latitude: sensorLat, longitude: sensorLong}
-    )
-    return distancia
-    } 
-  }
-
-
 
   return (
     <View style={styles.container}>
@@ -134,26 +154,36 @@ export default function Mapa() {
           title="Posição atual"
           description="Sua posição na escola!"
           coordinate={{latitude: lat, longitude: long}}/>
-          
-          
-              {/* <Marker pinColor='blue' onPress={()=> {console.log("Cliquei");}}coordinate={{latitude: latSensor, longitude: longSensor}}>
-            <Image style={styles.sensorImg} source={require('./assets/SensorImg.png')}/>
-            </Marker>  */}
-            <Marker pinColor='blue' onPress={()=> {console.log("Cliquei");}} coordinate={{latitude: latSensor, longitude: longSensor}}/>
-       
-            <Polyline
+          {sensores.length > 0 ? 
+            sensores.map(sensor => {
+              return <Marker key={sensor.id} 
+              pinColor='blue' 
+              onPress={()=> {
+                setSensorId(sensor.id)
+              }} 
+              coordinate={{latitude: sensor.latitude, longitude: sensor.longitude}}
+              description={sensor.localizacao}
+              />
+            }) : () => console.log("Não deu")
+            }
+              
+
+            {/* <Polyline
             coordinates={[
               { latitude: lat, longitude: long },
               { latitude: latSensor, longitude: longSensor }
             ]}
             strokeColor="#d90000"
             strokeWidth={2}
-          />
+          /> */}
           </MapView>
+          
 
         }
-
+    
+    {mensagem}
     </View>
+
 
   );
 }

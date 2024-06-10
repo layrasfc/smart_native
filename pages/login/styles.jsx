@@ -20,15 +20,17 @@ export const styles = StyleSheet.create({
 
   logo: {
     flex: 1,
-    width: '100%',
+    width: '30%',
     display: 'flex',
     flexDirection: 'column',
 
   },
   logoImg: {
     flex: 1,
-    resizeMode: 'contain',
     marginHorizontal: 10,
+    width: '100%',
+    height: undefined,
+    resizeMode: 'contain'
   },
 
   title: {
