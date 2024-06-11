@@ -15,7 +15,7 @@ export default function Navegacao(){
       options={{
         headerShown: false,
         tabBarIcon: ({ size, color }) => (
-          <Feather name="map" size={size} color={color} />
+          <Feather name="home" size={size} color={color} />
         )
       }}/>
       <Tab.Screen
@@ -24,7 +24,7 @@ export default function Navegacao(){
       options={{
         headerShown: false,
         tabBarIcon: ({ size, color }) => (
-          <Feather name="file-minus" size={size} color={color} />
+          <Feather name="map" size={size} color={color} />
         )
       }}/>
 

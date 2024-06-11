@@ -1,5 +1,5 @@
 
-import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import { styles } from './styles.jsx';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState,
@@ -32,6 +32,7 @@ export default function Mapa() {
   const[token, setToken] = useState(null)
 
   const[sensorId, setSensorId] = useState(0)
+  const [distancia, setDistancia] = useState(null);
 
 
   useEffect(() =>{
@@ -84,18 +85,21 @@ export default function Mapa() {
     if(sensorId != 0) {
       const sensor = sensores.find(sensor => sensor.id === sensorId)
       
-      setMensagem(<View><Text>Informações do sensor:</Text>
-      <Text>Tipo: {sensor.tipo}</Text>
-      <Text>Localização: {sensor.localizacao}</Text>
-      <Text>Responsaveis: {sensor.responsavel}</Text>
-      <Text>Status: {sensor.status_operacional ? "Ligado" : "Desligado"}</Text>
-      <TouchableOpacity style={styles.formButton} onPress={() => {pegarDados(sensor.id, sensor.tipo.toLowerCase())}}><Text>Ver mais</Text></TouchableOpacity>
-      </View>)
+      setMensagem(
+        <View><Text>Informações do sensor:</Text>
+        <Text>Tipo: {sensor.tipo}</Text>
+        <Text>Localização: {sensor.localizacao}</Text>
+        <Text>Responsaveis: {sensor.responsavel}</Text>
+        <Text>Status: {sensor.status_operacional ? "Ligado" : "Desligado"}</Text>
+        <Text>Distância em relação ao sensor: {getDistance({latitude: sensor.latitude, longitude: sensor.longitude}, {latitude: lat, longitude: long})}km</Text>
+        <TouchableOpacity style={styles.formButton} onPress={() => {pegarDados(sensor.id, sensor.tipo.toLowerCase())}}><Text>Ver mais</Text></TouchableOpacity>
+        </View>
+      )
+
     }
   }, [sensorId])
 
   const pegarDados = async(id, tipo) => {
-    
     console.log("Cheguei aqui, ", id, " tipo: ", tipo);
     const response = await axios.post(`https://layrasfc.pythonanywhere.com/api/${tipo}_filter/`, 
       {
@@ -109,6 +113,7 @@ export default function Mapa() {
         })
     console.log(response.data.results);
   }
+
   // Pegar a localização padrão
   useEffect(() => {
     solicitarAcesso();

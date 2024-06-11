@@ -42,9 +42,9 @@ export default function Login({ navigation }){
     <View style={styles.container}>
       <View style={styles.content}>
       <View style={styles.logo}>
-        <Image
+      <Image
           style={styles.logoImg}
-          source={require('../../assets/logo.png')}
+          source={require('../../assets/logotipo.png')}
         />
       </View>
 
