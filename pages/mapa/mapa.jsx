@@ -21,7 +21,8 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import { getDistance } from 'geolib';
 import axios from 'axios';
 
-export default function Mapa() {
+
+export default function Mapa({ navigation }) {
   const[location, setLocation] = useState(null);
   const[lat, setLat] = useState(null);
   const[long, setLong] = useState(null);
@@ -32,7 +33,6 @@ export default function Mapa() {
   const[token, setToken] = useState(null)
 
   const[sensorId, setSensorId] = useState(0)
-  const [distancia, setDistancia] = useState(null);
 
 
   useEffect(() =>{
@@ -100,7 +100,7 @@ export default function Mapa() {
   }, [sensorId])
 
   const pegarDados = async(id, tipo) => {
-    console.log("Cheguei aqui, ", id, " tipo: ", tipo);
+    const sensor = sensores.find(sensor => sensor.id === id)
     const response = await axios.post(`https://layrasfc.pythonanywhere.com/api/${tipo}_filter/`, 
       {
         sensor_id: id
@@ -111,7 +111,10 @@ export default function Mapa() {
             'Authorization': `Bearer ${token}`
           }
         })
-    console.log(response.data.results);
+    const dados = response.data.results
+    const titulo = sensor.tipo
+    const unidade = sensor.unidade_medida
+    navigation.navigate('Dados', {dados, titulo, unidade})
   }
 
   // Pegar a localização padrão

@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
   infoBanner: {
     flex: 4,
     flexDirection: 'row',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
   },
 
   esq: {
@@ -79,7 +79,6 @@ export const styles = StyleSheet.create({
   },
 
   subtituloPage: {
-
     fontSize: 19,
     fontWeight: '900',
     width: '45%',
@@ -89,9 +88,54 @@ export const styles = StyleSheet.create({
     flex: 5,
     width: '100%',
     paddingHorizontal: 15,
+    alignItems: 'center',
+    
   },
 
   optionsTitle: {
     gap: 10,
+    marginVertical: 30,
+    width: '100%',
+    paddingHorizontal: 10,
   },
+
+  optionsButtons: {
+    width: '90%',
+    flex: 1,
+    gap: 20,
+    justifyContent: 'center',
+  },
+
+  btHome: {
+    height: '40%',
+    backgroundColor: '#F7F7F7',
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: '#63768D',
+    flexDirection: 'row',
+
+    elevation: 2,
+  },
+
+  btImg: {
+    width: '30%',
+    resizeMode: 'contain',
+    
+  },
+
+  btInfo: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 13,
+  },
+
+  btText: {
+    width: '45%',
+    fontWeight: 'bold',
+    fontSize: 19,
+    color: '#63768D',
+
+  }
 });

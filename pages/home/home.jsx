@@ -54,16 +54,27 @@ export default function Home(){
           <Text style={styles.infoText}>Descubra</Text>
         </View>
         <Text style={styles.subtituloPage}>
-        O que gostaria de realizar hoje?
+        O quê gostaria de realizar hoje?
         </Text>
         </View>
 
-        <View className={styles.optionsButtons}>
+        <View style={styles.optionsButtons}>
           <TouchableOpacity style={styles.btHome}>
-            <Text>Visualizar mapa sensores</Text>
+            <View style={styles.btInfo}>
+            <Image
+            style={styles.btImg}
+            source={require('../../assets/mapa.png')}
+            />
+            <Text style={styles.btText}>Visualizar mapa sensores</Text></View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btHome}>
-            <Text>Visualizar todas as salas</Text>
+          <View style={styles.btInfo}>
+          <Image
+            style={styles.btImg}
+            source={require('../../assets/salas.png')}
+            />
+            <Text style={styles.btText}>Visualizar todas as salas</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
