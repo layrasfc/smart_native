@@ -1,4 +1,4 @@
-import { View, Text } from "react-native"
+import { View, Text, ScrollView } from "react-native"
 import styles from './styles.jsx'
 import { useState, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -22,26 +22,26 @@ export function MostrarDados(){
   })
 
   useEffect(() => {
-    console.log("nome: ", titulo, " tipo: ", unidade, " dados: ", dados);
+    console.log("DADOS: ", dados);
   }, [])
 
+
   return (
-    <View style={styles.container}>
-      <Text>Sensor: {titulo}</Text>
-      {dados.map((dado, index) => (
-        <View key={index} style={styles.dado}>
-          <Text>Dia: {dado.timestamp}</Text>
-          <Text>Valor: {dado.valor}{unidade}</Text>
+    <ScrollView  style={styles.container}>
+      <View style={styles.options}>
+      {dados.map((dado) => (
+        <View key={dado.id} style={styles.dado}>
+          <Text style={styles.titulo}>Informações: </Text>
+          <View>
+            <Text style={styles.info}>
+            <Text style={styles.subtitle}>- Dia: </Text>{dado.timestamp}</Text>
+          </View>
+          <View>
+            <Text style={styles.info}><Text style={styles.subtitle}>- Valor: </Text>{dado.valor}{unidade}</Text>
+          </View>
         </View>
-      ))} 
-      {/* {dados.map(dado => {
-        return 
-        <View style={styles.dado}>
-        <Text>Dia: {dado.timestamp}</Text>
-        <Text>Valor: {dado.timestamp}{unidade}</Text>
-        </View>
-      })} */}
-  
-    </View>
+      ))}
+      </View>
+    </ScrollView>
   )
 }

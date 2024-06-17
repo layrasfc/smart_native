@@ -30,6 +30,7 @@ export default function Navegacao(){
       component={Mapa}
       options={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarIcon: ({ size, color }) => (
           <Feather name="map" size={size} color={color} />
         )
@@ -39,6 +40,7 @@ export default function Navegacao(){
       component={MostrarDados}
       options={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarButton: () => null
       }}/>
 

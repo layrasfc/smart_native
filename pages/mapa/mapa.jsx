@@ -1,5 +1,5 @@
 
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, Modal } from 'react-native';
 import { styles } from './styles.jsx';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState,
@@ -15,11 +15,12 @@ import {
   // Escolher quão preciso será
   LocationAccuracy,
  } from 'expo-location';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapView, { Marker} from 'react-native-maps';
 
 // Calculo de distância
 import { getDistance } from 'geolib';
 import axios from 'axios';
+
 
 
 export default function Mapa({ navigation }) {
@@ -28,11 +29,13 @@ export default function Mapa({ navigation }) {
   const[long, setLong] = useState(null);
   const mapRef = useRef(MapView);
 
-  const [mensagem, setMensagem] = useState(null)
   const[sensores, setSensores] = useState([])
   const[token, setToken] = useState(null)
 
-  const[sensorId, setSensorId] = useState(0)
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSensor, setSelectedSensor] = useState(null);
+
 
 
   useEffect(() =>{
@@ -80,24 +83,13 @@ export default function Mapa({ navigation }) {
       setLat(currentPosition.coords.latitude);
       setLong(currentPosition.coords.longitude);
     }}
-  
-  useEffect(() => {
-    if(sensorId != 0) {
-      const sensor = sensores.find(sensor => sensor.id === sensorId)
-      
-      setMensagem(
-        <View><Text>Informações do sensor:</Text>
-        <Text>Tipo: {sensor.tipo}</Text>
-        <Text>Localização: {sensor.localizacao}</Text>
-        <Text>Responsaveis: {sensor.responsavel}</Text>
-        <Text>Status: {sensor.status_operacional ? "Ligado" : "Desligado"}</Text>
-        <Text>Distância em relação ao sensor: {getDistance({latitude: sensor.latitude, longitude: sensor.longitude}, {latitude: lat, longitude: long})}km</Text>
-        <TouchableOpacity style={styles.formButton} onPress={() => {pegarDados(sensor.id, sensor.tipo.toLowerCase())}}><Text>Ver mais</Text></TouchableOpacity>
-        </View>
-      )
 
-    }
-  }, [sensorId])
+  
+    const mostrarInfo = (id) => {
+      const sensor = sensores.find((sensor) => sensor.id === id);
+      setSelectedSensor(sensor);
+      setModalVisible(true);
+    };
 
   const pegarDados = async(id, tipo) => {
     const sensor = sensores.find(sensor => sensor.id === id)
@@ -145,6 +137,49 @@ export default function Mapa({ navigation }) {
 
   return (
     <View style={styles.container}>
+          {selectedSensor && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Informações do sensor:</Text>
+              <Text style={styles.modalText}>Tipo: {selectedSensor.tipo}</Text>
+              <Text style={styles.modalText}>Localização: {selectedSensor.localizacao}</Text>
+              <Text style={styles.modalText}>Responsáveis: {selectedSensor.responsavel}</Text>
+              <Text style={styles.modalText}>
+                Status: {selectedSensor.status_operacional ? 'Ligado' : 'Desligado'}
+              </Text>
+              <Text style={styles.modalText}>
+                Distância em relação ao sensor: {getDistance(
+                  { latitude: selectedSensor.latitude, longitude: selectedSensor.longitude },
+                  { latitude: lat, longitude: long }
+                )} km
+              </Text>
+              <TouchableOpacity
+                style={styles.formButton}
+                onPress={() => {
+                  pegarDados(selectedSensor.id, selectedSensor.tipo.toLowerCase());
+                }}
+              >
+                <Text style={styles.textStyle}>Ver mais</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.fecharButton}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Fechar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+      
       {
         // Se tiver alguma localização
         location && 
@@ -167,7 +202,7 @@ export default function Mapa({ navigation }) {
               return <Marker key={sensor.id} 
               pinColor='blue' 
               onPress={()=> {
-                setSensorId(sensor.id)
+                mostrarInfo(sensor.id)
               }} 
               coordinate={{latitude: sensor.latitude, longitude: sensor.longitude}}
               description={sensor.localizacao}
@@ -175,21 +210,10 @@ export default function Mapa({ navigation }) {
             }) : () => console.log("Não deu")
             }
               
-
-            {/* <Polyline
-            coordinates={[
-              { latitude: lat, longitude: long },
-              { latitude: latSensor, longitude: longSensor }
-            ]}
-            strokeColor="#d90000"
-            strokeWidth={2}
-          /> */}
           </MapView>
-          
-
         }
-    
-    {mensagem}
+
+
     </View>
 
 
