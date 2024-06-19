@@ -39,7 +39,7 @@ export default function Navegacao(){
       name="Dados"
       component={MostrarDados}
       options={{
-        headerShown: false,
+        headerShown: true,
         tabBarShowLabel: false,
         tabBarButton: () => null
       }}/>

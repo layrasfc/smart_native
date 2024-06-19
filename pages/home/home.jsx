@@ -3,7 +3,10 @@ import { useState, useEffect } from "react"
 import { Text, View, Image, TouchableOpacity } from "react-native"
 import { styles } from './styles.jsx';
 
-export default function Home(){
+
+
+
+export default function Home({ navigation }){
   const [token, setToken] = useState('')
 
   useEffect(() => {
@@ -59,7 +62,10 @@ export default function Home(){
         </View>
 
         <View style={styles.optionsButtons}>
-          <TouchableOpacity style={styles.btHome}>
+          <TouchableOpacity style={styles.btHome}
+          onPress={() => {
+            navigation.navigate('Mapa')
+          }}>
             <View style={styles.btInfo}>
             <Image
             style={styles.btImg}

@@ -20,6 +20,7 @@ import MapView, { Marker} from 'react-native-maps';
 // Calculo de distância
 import { getDistance } from 'geolib';
 import axios from 'axios';
+import { Feather } from '@expo/vector-icons';
 
 
 
@@ -106,6 +107,7 @@ export default function Mapa({ navigation }) {
     const dados = response.data.results
     const titulo = sensor.tipo
     const unidade = sensor.unidade_medida
+    setModalVisible(!modalVisible)
     navigation.navigate('Dados', {dados, titulo, unidade})
   }
 
@@ -148,19 +150,33 @@ export default function Mapa({ navigation }) {
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>Informações do sensor:</Text>
-              <Text style={styles.modalText}>Tipo: {selectedSensor.tipo}</Text>
-              <Text style={styles.modalText}>Localização: {selectedSensor.localizacao}</Text>
-              <Text style={styles.modalText}>Responsáveis: {selectedSensor.responsavel}</Text>
+              <View style={styles.exitContainer}>
+              <Text style={styles.modalTitle}>Informações do sensor</Text>
+                <TouchableOpacity style={styles.exitBt} onPress={() => setModalVisible(!modalVisible)}>
+                <Feather name="x" size={20} color={'#9D9D9D'} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.textContainer}>
               <Text style={styles.modalText}>
-                Status: {selectedSensor.status_operacional ? 'Ligado' : 'Desligado'}
+                <Text style={styles.boldText}>Tipo: </Text> 
+                {selectedSensor.tipo}</Text>
+              <Text style={styles.modalText}>
+              <Text style={styles.boldText}>Localização: </Text> 
+                {selectedSensor.localizacao}</Text>
+              <Text style={styles.modalText}>
+              <Text style={styles.boldText}>Responsáveis: </Text> 
+                {selectedSensor.responsavel}</Text>
+              <Text style={styles.modalText}>
+              <Text style={styles.boldText}>Status: </Text> 
+                {selectedSensor.status_operacional ? 'Ligado' : 'Desligado'}
               </Text>
               <Text style={styles.modalText}>
-                Distância em relação ao sensor: {getDistance(
+              <Text style={styles.boldText}>Distância em relação ao sensor: </Text> 
+                {getDistance(
                   { latitude: selectedSensor.latitude, longitude: selectedSensor.longitude },
                   { latitude: lat, longitude: long }
                 )} km
-              </Text>
+              </Text></View>
               <TouchableOpacity
                 style={styles.formButton}
                 onPress={() => {
@@ -168,12 +184,6 @@ export default function Mapa({ navigation }) {
                 }}
               >
                 <Text style={styles.textStyle}>Ver mais</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.fecharButton}
-                onPress={() => setModalVisible(!modalVisible)}
-              >
-                <Text style={styles.textStyle}>Fechar</Text>
               </TouchableOpacity>
             </View>
           </View>

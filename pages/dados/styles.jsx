@@ -4,20 +4,20 @@ import { StyleSheet } from "react-native"
 const styles = StyleSheet.create({ 
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#F2F2F2",
         
         
     },
     dado: {
-        backgroundColor: '#F8F9FE',
+        backgroundColor: 'white',
         padding: 20,
-        width: '80%',
+        width: '90%',
         borderRadius: 5,
         elevation: 1,
     },
     options: {
         flex: 1,
-        gap: 20,
+        gap: 15,
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 20,
